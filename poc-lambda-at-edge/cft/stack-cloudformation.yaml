@@ -1,0 +1,91 @@
+Parameters:
+  OriginUrl:
+    Type: String
+    Description: The URL of the origin for the CloudFront distribution.
+  ViewerProtocolPolicy:
+    Type: String
+    Description: The viewer protocol policy for the CloudFront distribution.
+
+Resources:
+  EdgeLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            const request = event.Records[0].cf.request;
+            const user = request.headers['x-user'];
+            if (!user || user !== 'admin') {
+              return {
+                status: '403',
+                statusDescription: 'Forbidden',
+                body: 'Access denied',
+                headers: {
+                  'content-type': [{
+                    key: 'Content-Type',
+                    value: 'text/plain'
+                  }]
+                }
+              };
+            }
+            return request;
+          }
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs14.x
+      Timeout: 5
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !Sub '${OriginUrl}'
+            Id: S3Origin
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+
+        Enabled: true
+        Comment: CloudFront distribution with access control
+        DefaultRootObject: index.html
+
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: !Ref ViewerProtocolPolicy
+          ForwardedValues:
+            QueryString: 'false'
+            Cookies:
+              Forward: none
+          TrustedSigners:
+            Enabled: false
+            Quantity: 0
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+          MinTTL: 0
+          DefaultTTL: 86400
+          MaxTTL: 31536000
+          LambdaFunctionAssociations:
+            - EventType: viewer-request
+              LambdaFunctionARN: !GetAtt EdgeLambdaFunction.Arn
+
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+
+        Restrictions:
+          GeoRestriction:
+            RestrictionType: none
+
+  DNSRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: EXAMPLEZONEID
+      Name: !Sub 'mydistribution.${DNSName}'
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt CloudFrontDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+        EvaluateTargetHealth: false

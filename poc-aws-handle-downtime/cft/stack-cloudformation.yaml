@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "CloudFormation Stack for Maintenance Page "
+Parameters:
+  BucketName:
+    Type: String
+    Description: "S3 bucket name for maintenance page"
+    Default: "maintenance-page-example"
+  DistributionComment:
+    Type: String
+    Description: "Comment for CloudFront distribution"
+    Default: "Maintenance Page Distribution"
+  RecordName:
+    Type: String
+    Description: "DNS record name for maintenance page"
+    Default: "maintenance.example.com"
+Resources:
+  MaintenancePageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      AccessControl: PublicRead
+  MaintenancePageObject:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref MaintenancePageBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Sid: PublicReadGetObject
+          Effect: Allow
+          Principal: "*"
+          Action: "s3:GetObject"
+          Resource: !Join ["", ["arn:aws:s3:::", !Ref BucketName, "/*"]]
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Sid: PublicReadGetObject
+          Effect: Allow
+          Principal: "*"
+          Action: "s3:GetObject"
+          Resource: !Join ["", ["arn:aws:s3:::", !Ref BucketName, "/*"]]
+  MaintenancePageDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: !Ref DistributionComment
+        Enabled: true
+        Origins:
+        - DomainName: !GetAtt MaintenancePageBucket.RegionalDomainName
+          Id: maintenance-page-origin
+          S3OriginConfig:
+            OriginAccessIdentity: ""
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - GET
+          - HEAD
+          CachedMethods:
+          - GET
+          - HEAD
+          TargetOriginId: maintenance-page-origin
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: redirect-to-https
+          MinTTL: 0
+          DefaultTTL: 0
+          MaxTTL: 0
+        ViewerCertificate:
+          AcmCertificateArn: "arn:aws:acm:us-east-1:123456789012:certificate/abcd1234-abcd-1234-abcd-1234abcd5678"
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2018
+  MaintenancePageRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: EXAMPLEZONEID
+      Name: !Ref RecordName
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt MaintenancePageDistribution.DomainName
+        EvaluateTargetHealth: false
+  JenkinsJob:
+    Type: AWS::CodePipeline::CustomActionType
+    Properties:
+      Category: Deploy
+      Provider: Jenkins
+      Version: "1"
+      Settings:
+        EntityUrlTemplate: !Sub "https://JENKINS_URL/job/{Config:ProjectName}/{Config:BuildNumber}/"
+        ExecutionUrlTemplate: !Sub "https://JENKINS_URL/job/{Config:ProjectName}/{Config:BuildNumber}/console"
+        RevisionUrlTemplate: !Sub "https://JENKINS_URL/job/{Config

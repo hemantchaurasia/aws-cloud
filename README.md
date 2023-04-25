@@ -11,3 +11,6 @@ https://github.com/hemantchaurasia/aws-cloud/blob/main/poc-aws-whitelist-cf-traf
 
 </br>4. Create an EKS Cluster in AWS environment using the Terraform
 https://github.com/hemantchaurasia/aws-cloud/blob/main/poc-aws-eks-cluster
+
+</br>5. Deploy Serverless Applications with AWS Lambda and API Gateway
+https://github.com/hemantchaurasia/aws-cloud/tree/main/poc-aws-serverless-lambda

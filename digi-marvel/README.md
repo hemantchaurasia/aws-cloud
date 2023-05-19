@@ -2,4 +2,4 @@
 
 ### Tech stack:
 **Infra:** AWS Cloud
-**Application:** ReactJS | TypeScript | MongoDB
+</br> **Application:** ReactJS | TypeScript | MongoDB

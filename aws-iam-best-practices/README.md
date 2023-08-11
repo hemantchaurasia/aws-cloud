@@ -13,15 +13,15 @@ Set up AWS CloudWatch alarms to be alerted about unusual or suspicious activity.
 
 **Follow the AWS Shared Responsibility Model:** Understand the department of security duties between AWS and you as the client.mSecure your applications and data in addition to configuring IAM settings.
 
-**Regularly Rotate Access Keys
+**Regularly Rotate Access Keys**
 
-Implement Strong Password Policies
+**Implement Strong Password Policies**
 
-Enable MFA for IAM Users**
+**Enable MFA for IAM Users**
 
 **Use IAM Access Analyzer:** Utilize IAM Access Analyzer to identify unintended resource access and potential security risks caused by overly permissive policies.
 
 **Enable AWS Organizations and Service Control Policies (SCPs):**
 Use AWS Organizations to consolidate and manage multiple AWS accounts. Apply Service Control Policies (SCPs) at the organization level to centrally manage and restrict permissions.
 
-**Regularly Review IAM Policies and Users:** Periodically assessment and update IAM guidelines and customers to make certain they align with your company's wishes and protection necessities.
+**Regularly Review IAM Policies and Users:** Periodically assess and update IAM guidelines and customers to make certain they align with your company's wishes and protection necessities.

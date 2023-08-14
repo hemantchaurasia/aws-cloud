@@ -43,3 +43,15 @@ Before deploying your IAM roles and policies to production, thoroughly test them
 **10. Documentation and auditing:**
 
 Keep track of our IAM roles, policies, and the justifications for the permissions they grant. Make sure our IAM configurations consistently reflect the requirements of our application and security best practices by reviewing and auditing them.
+
+**A separate repository for IAM roles/policies can have several advantages, like:**
+
+**_Centralized Management:_** A dedicated IAM repository can act as a central source of truth for all your IAM roles and policies. This makes it easier to track changes, review permissions, and maintain a consistent security posture across the organization.
+
+**_Isolation and Modularity:_** Keeping IAM roles in a separate repository can provide a clear separation between infrastructure-related code (IAM) and application code. This promotes modularity and makes it easier to manage changes and updates to IAM configurations.
+
+**_Automation:_** With a dedicated IAM repository, we can implement automated processes for role creation, policy updates, and permissions reviews. This can help ensure that IAM configurations follow best practices and are consistently applied.
+
+**_Collaboration:_** Separate repositories can allow specialized teams (e.g., security or infrastructure teams) to focus on IAM-related tasks without needing to navigate through application code. It can also facilitate collaboration between teams responsible for different aspects of our infrastructure.
+
+**_Version Control:_** Version control systems like ADO/Git can help us track changes, revert to previous configurations, and maintain an audit trail for our IAM policies.
